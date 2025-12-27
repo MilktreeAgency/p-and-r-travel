@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, Plane, Phone } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -12,6 +13,18 @@ const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   return (
     <nav
@@ -51,28 +64,108 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-[#020887]"
+          className="md:hidden text-[#020887] z-[60] relative"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
+          {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-[#F3F2EF] border-b border-gray-200 p-6 md:hidden flex flex-col gap-4 shadow-xl">
-          <a href="#" className="text-lg font-medium text-[#020887]">Flights</a>
-          <a href="#" className="text-lg font-medium text-[#020887]">Luxury Holidays</a>
-          <a href="#" className="text-lg font-medium text-[#020887]">Religious Tours</a>
-          <a href="#" className="text-lg font-medium text-[#020887]">Serena Hotels</a>
-          <a href="#" className="text-lg font-medium text-[#020887]">About Our Heritage</a>
-          <hr className="border-gray-300 my-2" />
-          <button className="text-left font-semibold text-[#020887]">My Account / Register</button>
-          <button className="w-full bg-[#020887] text-white px-5 py-3 rounded-full font-bold">
-            Request Quote
-          </button>
-        </div>
-      )}
+      {/* Full-Screen Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-[#020887] z-[55] md:hidden"
+          >
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute top-10 right-10 w-64 h-64 border-2 border-white rounded-full" />
+              <div className="absolute bottom-20 left-10 w-48 h-48 border-2 border-white rounded-full" />
+              <Plane className="absolute top-1/3 right-1/4 w-32 h-32 text-white transform rotate-45" />
+            </div>
+
+            {/* Menu Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+              className="relative h-full flex flex-col justify-between p-8 pt-24 overflow-y-auto"
+            >
+              {/* Logo */}
+              <div className="mb-12">
+                <img 
+                  src="/pandr-logo.png" 
+                  alt="P&R Travel" 
+                  className="h-12 w-auto brightness-0 invert"
+                />
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="flex-1 flex flex-col gap-1">
+                {[
+                  { label: 'Flights', href: '#' },
+                  { label: 'Luxury Holidays', href: '#' },
+                  { label: 'Religious Tours', href: '#' },
+                  { label: 'Serena Hotels', href: '#' },
+                  { label: 'About Our Heritage', href: '#' },
+                ].map((link, index) => (
+                  <motion.a
+                    key={link.label}
+                    href={link.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + index * 0.05 }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-white text-3xl font-bold py-4 border-b border-white/10 hover:bg-white/5 transition-colors active:bg-white/10 -mx-4 px-4"
+                  >
+                    {link.label}
+                  </motion.a>
+                ))}
+              </nav>
+
+              {/* Bottom Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-4 pt-8 border-t border-white/20"
+              >
+                <button 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-3 text-white font-semibold text-lg py-4 border-2 border-white/30 rounded-2xl hover:bg-white/10 transition-colors active:bg-white/20"
+                >
+                  <User size={20} />
+                  My Account / Register
+                </button>
+                <button 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-3 bg-[#95B2B0] text-[#020887] font-bold text-lg py-4 rounded-2xl hover:bg-white transition-colors shadow-xl active:scale-95"
+                >
+                  <Phone size={20} />
+                  Request Quote
+                </button>
+              </motion.div>
+
+              {/* Contact Info */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-center text-white/60 text-sm mt-8"
+              >
+                <p className="font-medium">40 Years of Excellence</p>
+                <p className="text-white/40 text-xs mt-1">Call us for exclusive rates</p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
