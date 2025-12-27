@@ -82,6 +82,18 @@ const Navbar: React.FC = () => {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 bg-[#020887] z-[55] md:hidden"
           >
+            {/* Close Button - Top Right */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-6 right-6 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border-2 border-white/20 flex items-center justify-center hover:bg-white/20 active:scale-90 transition-all"
+              aria-label="Close menu"
+            >
+              <X className="w-6 h-6 text-white" strokeWidth={2.5} />
+            </motion.button>
+
             {/* Animated Background Pattern */}
             <div className="absolute inset-0 opacity-5">
               <div className="absolute top-10 right-10 w-64 h-64 border-2 border-white rounded-full" />
@@ -95,7 +107,7 @@ const Navbar: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ delay: 0.1, duration: 0.3 }}
-              className="relative h-full flex flex-col justify-between p-8 pt-24 overflow-y-auto"
+              className="relative h-full flex flex-col justify-between p-8 pt-20 overflow-y-auto"
             >
               {/* Logo */}
               <div className="mb-12">
