@@ -42,6 +42,7 @@ const recentlyViewed = [
 const DestinationsSection: React.FC = () => {
   const destinationsScrollRef = useRef<HTMLDivElement>(null);
   const recentlyViewedScrollRef = useRef<HTMLDivElement>(null);
+  const [activeDestinationIndex, setActiveDestinationIndex] = React.useState(0);
 
   const scrollDestinations = (direction: 'left' | 'right') => {
     if (destinationsScrollRef.current) {
@@ -65,6 +66,24 @@ const DestinationsSection: React.FC = () => {
     }
   };
 
+  // Track scroll position for indicator dots
+  const handleDestinationsScroll = () => {
+    if (destinationsScrollRef.current) {
+      const scrollLeft = destinationsScrollRef.current.scrollLeft;
+      const cardWidth = destinationsScrollRef.current.scrollWidth / destinations.length;
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveDestinationIndex(index);
+    }
+  };
+
+  React.useEffect(() => {
+    const ref = destinationsScrollRef.current;
+    if (ref) {
+      ref.addEventListener('scroll', handleDestinationsScroll);
+      return () => ref.removeEventListener('scroll', handleDestinationsScroll);
+    }
+  }, []);
+
   const handleDestinationClick = (destination: string) => {
     console.log('Navigating to:', destination);
     // Add your navigation logic here
@@ -86,28 +105,28 @@ const DestinationsSection: React.FC = () => {
 
         {/* Horizontal Scroll / Grid */}
         <div className="relative group">
-            {/* Left Arrow */}
+            {/* Left Arrow - Visible on all devices */}
             <button 
               onClick={() => scrollDestinations('left')}
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full p-4 shadow-xl border border-gray-100 hover:scale-110 transition-transform text-[#020887] -ml-6"
+              className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full p-3 md:p-4 shadow-2xl border border-gray-200 hover:scale-110 active:scale-95 transition-transform text-[#020887] md:-ml-6"
               aria-label="Scroll left"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={20} className="md:w-6 md:h-6" />
             </button>
 
-            {/* Right Arrow */}
+            {/* Right Arrow - Visible on all devices */}
             <button 
               onClick={() => scrollDestinations('right')}
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full p-4 shadow-xl border border-gray-100 hover:scale-110 transition-transform text-[#020887] -mr-6"
+              className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full p-3 md:p-4 shadow-2xl border border-gray-200 hover:scale-110 active:scale-95 transition-transform text-[#020887] md:-mr-6"
               aria-label="Scroll right"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={20} className="md:w-6 md:h-6" />
             </button>
 
             <div 
               ref={destinationsScrollRef}
-              className="flex gap-4 md:gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x px-1 scroll-smooth"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex gap-4 md:gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory px-1 scroll-smooth -mx-2 md:mx-0"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
             >
             {destinations.map((dest, idx) => (
                 <div 
@@ -133,6 +152,30 @@ const DestinationsSection: React.FC = () => {
                     <h3 className="absolute bottom-6 left-6 text-3xl font-bold text-white tracking-tight">{dest.name}</h3>
                 </div>
             ))}
+            </div>
+
+            {/* Scroll Indicator Dots - Mobile Only */}
+            <div className="flex justify-center gap-2 mt-4 md:hidden">
+              {destinations.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    if (destinationsScrollRef.current) {
+                      const cardWidth = destinationsScrollRef.current.scrollWidth / destinations.length;
+                      destinationsScrollRef.current.scrollTo({
+                        left: cardWidth * idx,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  className={`transition-all duration-300 rounded-full ${
+                    activeDestinationIndex === idx 
+                      ? 'w-8 h-2 bg-[#020887]' 
+                      : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to ${destinations[idx].name}`}
+                />
+              ))}
             </div>
         </div>
 
