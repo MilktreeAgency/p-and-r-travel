@@ -21,11 +21,12 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-1">
-          <span className="text-2xl font-extrabold tracking-tight text-[#020887] relative">
-            P&R Travel
-            <span className="absolute -top-1 -right-3 text-[#334195] text-xl">✦</span>
-          </span>
+        <div className="flex items-center">
+          <img 
+            src="/pandr-logo.png" 
+            alt="P&R Travel" 
+            className="h-10 w-auto"
+          />
         </div>
 
         {/* Desktop Links */}
